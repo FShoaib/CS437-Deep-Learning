@@ -1,0 +1,429 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.7.1"
+    },
+    "colab": {
+      "name": "DL_PA6.ipynb",
+      "provenance": [],
+      "collapsed_sections": [],
+      "machine_shape": "hm"
+    },
+    "accelerator": "GPU"
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "p6LppVHVcehz",
+        "colab_type": "text"
+      },
+      "source": [
+        "Note: If you are using the Google Colab and want to use tensorflow < 2: you will have to downgrade using this link. https://colab.research.google.com/notebooks/tensorflow_version.ipynb"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "xQXc2RLkcunR",
+        "colab_type": "text"
+      },
+      "source": [
+        "# Sentiment Analysis on IMDB Movie Review dataset"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "PmM9nJuqc61S",
+        "colab_type": "text"
+      },
+      "source": [
+        "Sentiment analysis is one of the key areas of research in NLP and Sequence modelling. We will be using LSTMs and Bi-directional LSTMs to predict two classes - positive or negative sentiment.\n",
+        "\n",
+        "\n",
+        "You will be reading the dataset from here: https://drive.google.com/file/d/127PCwycL0oToSF6l-c2oFuBkacYsmlgK/view?usp=sharing\n",
+        "\n",
+        "You can use this blog for understanding: https://towardsdatascience.com/word-embeddings-for-sentiment-analysis-65f42ea5d26e"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "ExecuteTime": {
+          "end_time": "2020-04-07T13:31:26.633881Z",
+          "start_time": "2020-04-07T13:31:26.624745Z"
+        },
+        "_cell_guid": "b1076dfc-b9ad-4769-8c92-a6c4dae69d19",
+        "_uuid": "8f2839f25d086af736a60e9eeb907d3b93b6e0e5",
+        "id": "hT5xlQy1_UY6",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "import numpy as np \n",
+        "import pandas as pd \n",
+        "from keras.datasets import imdb\n",
+        "from keras.models import Sequential\n",
+        "from keras.layers import Dense, LSTM, Conv1D, MaxPooling1D, Conv1D, Dropout, Bidirectional\n",
+        "from keras.layers.embeddings import Embedding\n",
+        "from keras.preprocessing import sequence\n",
+        "from sklearn.model_selection import train_test_split"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "apFydSt_d1bv",
+        "colab_type": "text"
+      },
+      "source": [
+        "All the relevant libraries are imported. \n",
+        "You are free to change as you please. \n",
+        "Using the GPU backend is recommended as LSTMs are computationally expensive to train.\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "kgb27C2ceFmU",
+        "colab_type": "text"
+      },
+      "source": [
+        "## Data handling - exploration and cleaning\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "4XNC2zKWeNcP",
+        "colab_type": "text"
+      },
+      "source": [
+        "\n",
+        "\n",
+        "1.   You are expected to read the dataset into a dataframe.\n",
+        "2.   This is a real world dataset and you will be expected to clean the dataset.\n",
+        "\n",
+        "1.   This includes removing trailing spaces and HTML tags.\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "ExecuteTime": {
+          "end_time": "2020-04-07T13:31:49.259950Z",
+          "start_time": "2020-04-07T13:31:47.540221Z"
+        },
+        "id": "7azvBQpa_UZy",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "df = pd.read_csv('PATH_TO_DATASET')\n"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "5EAO393yfEK5",
+        "colab_type": "text"
+      },
+      "source": [
+        "### Data Cleaning - write the techniques you employed and the achieved results"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "ExecuteTime": {
+          "end_time": "2020-04-07T13:31:59.990645Z",
+          "start_time": "2020-04-07T13:31:59.942014Z"
+        },
+        "id": "FVgxG8nE_UaT",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "# WRITE CODE HERE\n",
+        "# Sample code:\n",
+        "df['review'].str.replace('<HTML TAG/>', '')"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "uRVWsc1Lf0Af",
+        "colab_type": "text"
+      },
+      "source": [
+        "Write about the techniques used to clean:"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "xQw0av-Zgcyc",
+        "colab_type": "text"
+      },
+      "source": [
+        "### Data Exploration"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "M4n5GmwQgrOh",
+        "colab_type": "text"
+      },
+      "source": [
+        "\n",
+        "\n",
+        "1.   You are required to report the total number of distinct tokens present in the data set.\n",
+        "2.   Find out the minimum and max length of a review.\n",
+        "\n",
+        "An integral part of visualization when it comes to textual data is the generating of a word cloud.\n",
+        "\n",
+        "1.   \n",
+        "This task is open-ended and you can use any library of your choice. \n",
+        "NLTK is one such library. \n",
+        "2.   \n",
+        "Make sure to keep note of stop words.\n",
+        "\n",
+        "##Example:\n",
+        "\n",
+        "\n",
+        "![alt text](https://getthematic.com/wp-content/uploads/2018/03/Harris-Word-Cloud-e1522406279125.png)\n",
+        "\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "WC2IxMnwi9xz",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "#WRITE CODE HERE"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "4iC2QLmai9FK",
+        "colab_type": "text"
+      },
+      "source": [
+        "### Model processing\n",
+        "\n",
+        "You can use a 70:30 train/test split.\n",
+        "The labels are 'positive' and negative, you should assign them integers 0 or 1 for further processing."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "ExecuteTime": {
+          "end_time": "2020-04-07T13:32:51.202927Z",
+          "start_time": "2020-04-07T13:32:50.093015Z"
+        },
+        "id": "yRKTkhOR_Ub-",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "from keras.preprocessing.text import text_to_word_sequence\n",
+        "from keras.preprocessing.text import Tokenizer\n",
+        "import matplotlib.pyplot as plt"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "_ymi3ltfpBpX",
+        "colab_type": "text"
+      },
+      "source": [
+        "### Tokenizer\n",
+        "You will need to use fit a tokenizer over your training and testing data.\n",
+        "\n",
+        "What does a tokenizer do?\n",
+        "It creates a dictionary of word to integer mappings. It updates internal vocabulary based on a list of texts. You should read up on the documentation before diving into the code. \n",
+        "\n",
+        "You will also be using the the text_to_sequence function will return integers based on a respective tokenizer.\n",
+        "\n",
+        "Make sure you **pad** your sequences to max length using sequence.pad_sequences()\n",
+        "\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "ExecuteTime": {
+          "end_time": "2020-04-07T13:33:17.380066Z",
+          "start_time": "2020-04-07T13:32:51.886856Z"
+        },
+        "id": "kJrQ9E5R_UcH",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "# WRITE CODE HERE"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "DXxkoySHqdgm",
+        "colab_type": "text"
+      },
+      "source": [
+        "### Embedding layer\n",
+        "You will be importing the embedding layer from Keras.\n",
+        "Embedding layers are common place when handling textual data. \n",
+        "Word embeddings provide a dense representation of words and their relative meanings.\n",
+        "\n",
+        "#### How do they work - via Stack Overflow\n",
+        "Link: https://stats.stackexchange.com/questions/270546/how-does-keras-embedding-layer-work\n",
+        "\n",
+        "The output vectors are not computed from the input using any mathematical operation. Instead, each input integer is used as the index to access a table that contains all posible vectors. That is the reason why you need to specify the size of the vocabulary as the first argument (so the table can be initialized).\n",
+        "\n",
+        "The most common application of this layer is for text processing. Let's see a simple example. Our training set consists only of two phrases:\n",
+        "\n",
+        "Hope to see you soon\n",
+        "\n",
+        "Nice to see you again\n",
+        "\n",
+        "So we can encode these phrases by assigning each word a unique integer number (by order of appearance in our training dataset for example). Then our phrases could be rewritten as:\n",
+        "\n",
+        "[0, 1, 2, 3, 4]\n",
+        "\n",
+        "[5, 1, 2, 3, 6]\n",
+        "\n",
+        "Now imagine we want to train a network whose first layer is an embeding layer. In this case, we should initialize it as follows:\n",
+        "\n",
+        "Embedding(7, 2, input_length=5)\n",
+        "\n",
+        "The first argument (7) is the number of distinct words in the training set. The second argument (2) indicates the size of the embedding vectors. The input_length argumet, of course, determines the size of each input sequence.\n",
+        "\n",
+        "Once the network has been trained, we can get the weights of the embedding layer, which in this case will be of size (7, 2) and can be thought as the table used to map integers to embedding vectors.\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "zjhYezEFx0Ov",
+        "colab_type": "text"
+      },
+      "source": [
+        "### Model Engineering\n",
+        "\n",
+        "You will be required to engineer three types of models from scratch.\n",
+        "\n",
+        "1.   Using LSTMs\n",
+        "2.   Bi-directional LSTMs\n",
+        "\n",
+        "1.   A model with less than 10,000 parameters - the lower the parameters, higher the score (provided accuracy is good)\n",
+        "\n",
+        "\n",
+        "For each model:\n",
+        "\n",
+        "1.   You will be reporting graphs for validation accuracy and training loss.\n",
+        "2.   What hyper-parameters, loss functions, optimizations, initializations were used. This should be clearly stated in your analysis.\n",
+        "\n",
+        "~90 percent and above is the desired accuracy. \n",
+        "\n",
+        "For model 3, CLEARLY report the number of parameters.\n",
+        "\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "ExecuteTime": {
+          "end_time": "2020-04-07T13:33:23.177585Z",
+          "start_time": "2020-04-07T13:33:22.426163Z"
+        },
+        "id": "x4Lkc7VA_Ucu",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "# CODE HERE\n",
+        "\n",
+        "# Some example code to help you get started\n",
+        "# X_train is your training data \n",
+        "# input_dim is your dictionary length, output_dim is the length is the dimension of the dense embedding, you can choose whatever works best for you, starting with 2.\n",
+        "model = Sequential()\n",
+        "model.add(Embedding(input_dim, output_dim, input_length=X_train.shape[1]))\n",
+        "model.add(LSTM(200))\n",
+        "# You can choose to complete this model per your choice\n"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "AGwyrHW-zcUF",
+        "colab_type": "text"
+      },
+      "source": [
+        "### Model Predictions. For your best performing model\n",
+        "\n",
+        "Come up with ten sample sentences NOT part of the original data set. \n",
+        "Use model.predict() to generate predictions and report positive or negative sentiment."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "N2Kjtxl8Qu4P",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": 0,
+      "outputs": []
+    }
+  ]
+}
